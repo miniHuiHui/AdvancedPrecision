@@ -121,6 +121,31 @@ print(sum(fpe_dot(vec_a, vec_b, k=4)))  # ~1.0
 Run ``pytest`` to execute the accompanying accuracy checks that compare the
 expansion routines against Python ``decimal`` references.
 
+### Simple NumPy neural network helper
+
+The ``advanced_precision.simple_nn`` module provides a small utility for
+experimenting with NumPy-based feed-forward networks without pulling in a full
+deep-learning stack.  Supply weight matrices, bias vectors, and an input batch,
+then call ``forward`` to obtain the activations of the final layer:
+
+```python
+import numpy as np
+
+from advanced_precision.simple_nn import forward
+
+weights = [
+    np.array([[0.2, -0.4], [0.7, 0.1]]),
+    np.array([[0.5], [-0.3]]),
+]
+biases = [
+    np.array([0.1, -0.2]),
+    np.array([0.05]),
+]
+inputs = np.array([[1.0, 0.5]])
+
+output = forward(weights, biases, inputs)
+```
+
 ### PyTorch integration helpers
 
 The ``advanced_precision.torch_support`` module exposes a light-weight bridge
