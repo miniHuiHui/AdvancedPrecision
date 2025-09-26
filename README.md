@@ -121,6 +121,38 @@ print(sum(fpe_dot(vec_a, vec_b, k=4)))  # ~1.0
 Run ``pytest`` to execute the accompanying accuracy checks that compare the
 expansion routines against Python ``decimal`` references.
 
+### PyTorch integration helpers
+
+The ``advanced_precision.torch_support`` module exposes a light-weight bridge
+for experimenting with floating-point expansions inside PyTorch.  When PyTorch
+is installed, importing ``advanced_precision`` also re-exports the helpers so
+you can write:
+
+```python
+import torch
+from advanced_precision import (
+    TorchExpansionTensor,
+    set_default_torch_limb_count,
+    torch_to_tensor,
+)
+
+set_default_torch_limb_count(6)  # ≈ FP256
+
+weights = torch.randn(128, 128)
+expansion_weights = TorchExpansionTensor.from_tensor(weights)
+
+# High-precision matmul using limb schoolbook products + renormalization
+activations = TorchExpansionTensor.from_tensor(torch.randn(32, 128))
+expanded_output = expansion_weights.matmul(activations)
+float_output = expanded_output.to_tensor()
+```
+
+The helpers operate purely on ``torch.float64`` tensors so they work on CPU or
+GPU, and they preserve PyTorch autograd by never leaving the tensor world.  The
+global ``set_default_torch_limb_count`` knob allows you to switch between
+double-double, quad-double, or ~FP256 precision without modifying the rest of
+your PyTorch model code.
+
 ## 9. Validation & roadmap
 
 * Compare against CPU references (MPFR/Boost.Multiprecision) for correctness.
